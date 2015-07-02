@@ -16,8 +16,8 @@ int main() {
 				+ "%2C+"
 				+ gps_records[i]["lon"].as<std::string>()
 				+ "&format=jsonv2";
-			std::string outpath = "wget_out.json";
-			std::string command = "bin\\wget.exe --output-document=" + outpath + " " + url;
+			std::string outname = "wget_out.json";
+			std::string command = "wget --output-document=" + outname + " " + url;
 
 			system(command.c_str());
 
