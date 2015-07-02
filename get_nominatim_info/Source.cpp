@@ -1,9 +1,6 @@
-#include <iostream>
-#include <string>
-#include <jsoncons/json.hpp>
+#include "jsoncons/json.hpp"
 
 int main() {
-
 
 	jsoncons::json gps_records = jsoncons::json::parse_file("records.json");
 
