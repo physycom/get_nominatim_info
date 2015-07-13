@@ -16,11 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with json_to_html. If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
-#include <fstream>
-#include <stdexcept>
-#include <string>
+
 #include "jsoncons/json.hpp"
-//#include "jsoncons/json.hpp"
 
 int main(int narg, char** argv) {
   std::string input_name, output_name;
