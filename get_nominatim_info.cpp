@@ -23,149 +23,145 @@ along with json_to_html. If not, see <http://www.gnu.org/licenses/>.
 #define MINOR_VERSION           0
 
 int main(int narg, char** argv) {
-  // Usage
-  std::cout << "Get_Nominatim_Info - v" << MAJOR_VERSION << "." << MINOR_VERSION << std::endl;
-  std::cout << "Usage: " << argv[0] << " -i [input.json] -o [output.json]" << std::endl;
-  std::cout << "\t- [input.json] UNIBO style GPS .json file to parse" << std::endl;
-  std::cout << "\t- [output.json] improved .json with geolocalization data" << std::endl;
-  
-   // Parsing command line
-  std::string input_name, output_name, outjson_type{};
-  if (narg > 2){ /* Parse arguments, if there are arguments supplied */
-    for (int i = 1; i < narg; i++){
-      if ((argv[i][0] == '-') || (argv[i][0] == '/')){       // switches or options...
-        switch (tolower(argv[i][1])){
-        case 'i':
-          input_name = argv[++i];
-          break;
-        case 'o':
-          output_name = argv[++i];
-          break;
-        case 'f':
-          outjson_type = argv[++i];
-          break;
-        default:    // no match...
-          std::cout << "Flag \"" << argv[i] << "\" not recognized. Quitting..." << std::endl;
-          exit(1);
-        }
-      }
-      else {
-        std::cout << "Flag \"" << argv[i] << "\" not recognized. Quitting..." << std::endl;
-        exit(11);
-      }
-    }
-  }
-  else { std::cout << "No flags specified. Read usage and relaunch properly." << std::endl; exit(111); }
-
-  // Safety checks for file manipulations 
-  if (input_name.size() > 5){
-    if (input_name.substr(input_name.size() - 5, 5) != ".json"){
-      std::cout << input_name << " is not a valid .json file. Quitting..." << std::endl;
-      exit(2);
-    }
-  }
-  else{
-    std::cout << input_name << " is not a valid .json file. Quitting..." << std::endl;
-    exit(22);
-  }
-
-  // Parsing of input.json and building of output.json
-  jsoncons::json gps_records = jsoncons::json::parse_file(input_name);
+	// Usage
+	std::cout << "Get_Nominatim_Info - v" << MAJOR_VERSION << "." << MINOR_VERSION << std::endl;
+	std::cout << "Usage: " << argv[0] << " -i [input.json] -o [output.json] -f [output format specifier]" << std::endl;
+	std::cout << "\t- [input.json] UNIBO style GPS .json file to parse" << std::endl;
+	std::cout << "\t- [output.json] improved .json with geolocalization data" << std::endl;
+	std::cout << "\t- [format specifier] use 'a' (without quotes) for array json, 'o' for object json" << std::endl;
+	std::cout << "\t- -f is optional, if omitted the output format will reflect the input file" << std::endl;
 
 
-  jsoncons::json outjson;
+	// Parsing command line
+	std::string input_name, output_name, outjson_type{};
+	if(narg > 2) { /* Parse arguments, if there are arguments supplied */
+		for(int i = 1; i < narg; i++) {
+			if(argv[i][0] == '-' || argv[i][0] == '/') {       // switches or options...
+				switch(tolower(argv[i][1])) {
+				case 'i':
+					input_name = argv[++i];
+					break;
+				case 'o':
+					output_name = argv[++i];
+					break;
+				case 'f':
+					outjson_type = argv[++i];
+					break;
+				default:    // no match...
+					std::cout << "Flag \"" << argv[i] << "\" not recognized. Quitting..." << std::endl;
+					exit(1);
+				}
+			} else {
+				std::cout << "Flag \"" << argv[i] << "\" not recognized. Quitting..." << std::endl;
+				exit(11);
+			}
+		}
+	} else { std::cout << "No flags specified. Read usage and relaunch properly." << std::endl; exit(111); }
+
+	// Safety checks for file manipulations 
+	if(input_name.size() > 5) {
+		if(input_name.substr(input_name.size() - 5, 5) != ".json") {
+			std::cout << input_name << " is not a valid .json file. Quitting..." << std::endl;
+			exit(2);
+		}
+	} else {
+		std::cout << input_name << " is not a valid .json file. Quitting..." << std::endl;
+		exit(22);
+	}
+
+	// Parsing of input.json and building of output.json
+	jsoncons::json gps_records = jsoncons::json::parse_file(input_name);
 
 
-  //decide output type
-  bool outtype_array = false;
+	jsoncons::json outjson;
 
-  if(outjson_type == "a") //array
-  outjson = jsoncons::json(jsoncons::json::an_array), outtype_array = true;
 
-  else if(outjson_type == "o") {} //object
+	//decide output type
+	bool outjson_is_array = false;
 
-  else if(outjson_type == "") {
-    if (gps_records.type() == 2) outjson = jsoncons::json(jsoncons::json::an_array), outtype_array = true;
-    //else if (gps_records.type() == 1) {}
-  }
-  
-  else {
-    std::cout << "Output type not recognized. Quitting..." << std::endl;
-    exit(4);
-  }
+	if(outjson_type == "a") //array
+		outjson = jsoncons::json(jsoncons::json::an_array), outjson_is_array = true;
 
-  if (gps_records.type() == 2) //array type
-    for (size_t i = 0; i < gps_records.size(); ++i) {
-      try {
-        std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
-          + gps_records[i]["lat"].as<std::string>()
-          + "%2C+"
-          + gps_records[i]["lon"].as<std::string>()
-          + "&format=jsonv2\"";
+	else if(outjson_type == "o") {} //object
 
-        std::string outname = "wget_out.json";
-        std::string command = "wget --output-document=" + outname + " " + url;
+	else if(outjson_type == "") {
+		if(gps_records.type() == 2) outjson = jsoncons::json(jsoncons::json::an_array), outjson_is_array = true;
+		//else if (gps_records.type() == 1) {}
+	}
 
-        system(command.c_str());
+	else {
+		std::cout << "Output type not recognized. Quitting..." << std::endl;
+		exit(4);
+	}
 
-        jsoncons::json wget_out = jsoncons::json::parse_file("wget_out.json");
+	if(gps_records.type() == 2) //array type
+		for(size_t i = 0; i < gps_records.size(); ++i) {
+			try {
+				std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
+					+ gps_records[i]["lat"].as<std::string>()
+					+ "%2C+"
+					+ gps_records[i]["lon"].as<std::string>()
+					+ "&format=jsonv2\"";
 
-        jsoncons::json ijson(gps_records[i]);
-        ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
+				std::string outname = "wget_out.json";
+				std::string command = "wget --output-document=" + outname + " " + url;
 
-        if(outtype_array) outjson.add(ijson);
-        else {
-          std::ostringstream ostr; ostr << "gps_record_" << std::setfill('0') << std::setw(7) << i;
-          outjson[ostr.str()] = ijson;
-        }
-      }
-      catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-      }
-    }
+				system(command.c_str());
 
-  else if (gps_records.type() == 1) //object type
-    for (auto rec = gps_records.begin_members(); rec != gps_records.end_members(); ++rec) {
-      try {
-        std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
-          + rec->value()["lat"].as<std::string>()
-          + "%2C+"
-          + rec->value()["lon"].as<std::string>()
-          + "&format=jsonv2\"";
+				jsoncons::json wget_out = jsoncons::json::parse_file("wget_out.json");
 
-        std::string outname = "wget_out.json";
-        std::string command = "wget --output-document=" + outname + " " + url;
+				jsoncons::json ijson(gps_records[i]);
+				ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
 
-        system(command.c_str());
+				if(outjson_is_array) outjson.add(ijson);
+				else {
+					std::ostringstream ostr; ostr << "gps_record_" << std::setfill('0') << std::setw(7) << i;
+					outjson[ostr.str()] = ijson;
+				}
+			} catch(const std::exception& e) {
+				std::cerr << e.what() << std::endl;
+			}
+		}
 
-        jsoncons::json wget_out = jsoncons::json::parse_file("wget_out.json");
+	else if(gps_records.type() == 1) //object type
+		for(auto rec = gps_records.begin_members(); rec != gps_records.end_members(); ++rec) {
+			try {
+				std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
+					+ rec->value()["lat"].as<std::string>()
+					+ "%2C+"
+					+ rec->value()["lon"].as<std::string>()
+					+ "&format=jsonv2\"";
 
-        jsoncons::json ijson(rec->value());
-        ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
+				std::string outname = "wget_out.json";
+				std::string command = "wget --output-document=" + outname + " " + url;
 
-        if(outtype_array) outjson.add(ijson);
-        else {
-          outjson[rec->name()] = ijson;
-        }
+				system(command.c_str());
 
-      }
-      catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-      }
-    }
+				jsoncons::json wget_out = jsoncons::json::parse_file("wget_out.json");
 
-    std::ofstream output_file;
+				jsoncons::json ijson(rec->value());
+				ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
 
-    output_file.open(output_name);
-    if (!output_file.is_open()) {
-    std::cout << "FAILED: Output file " << output_name << " could not be opened." << std::endl;
-    std::cout << "Hit ENTER to close.\n"; std::cin.get();
-    exit(333);
-    }
-    else { std::cout << "SUCCESS: file " << output_name << " opened!"<< std::endl; }
+				if(outjson_is_array) outjson.add(ijson);
+				else {
+					outjson[rec->name()] = ijson;
+				}
+			} catch(const std::exception& e) {
+				std::cerr << e.what() << std::endl;
+			}
+		}
 
-    output_file << jsoncons::pretty_print(outjson) << std::endl;
-    output_file.close();
+	std::ofstream output_file;
 
-    return 0;
+	output_file.open(output_name);
+	if(!output_file.is_open()) {
+		std::cout << "FAILED: Output file " << output_name << " could not be opened." << std::endl;
+		std::cout << "Hit ENTER to close.\n"; std::cin.get();
+		exit(333);
+	} else { std::cout << "SUCCESS: file " << output_name << " opened!" << std::endl; }
+
+	output_file << jsoncons::pretty_print(outjson) << std::endl;
+	output_file.close();
+
+	return 0;
 }

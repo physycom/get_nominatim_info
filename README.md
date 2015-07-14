@@ -1,19 +1,21 @@
 ### Installation
 **Make** and a **C++11** compatible compiler are required. Also **wget** must be a recognized system command (if you're on Windows, try http://www.gnu.org/software/wget/).
 
-Currently requires the included version of jsoncons library (https://github.com/danielaparker/jsoncons), and not any newer version.
+Uses jsoncons library (https://github.com/danielaparker/jsoncons).
 
 Clone the repo and type ``make all`` in your favourite shell.
 
 ### Usage
 ```
-get_nominatim_info.exe -i input.json -o output.json
+get_nominatim_info.exe -i input.json -o output.json -f [output style, 'a' (no quotes) for array or 'o' for object]
 ```
-where *input.json* must be an existing and valid .json file, and must have "lat" and "lon" fields. An *output.json* file will be created with the street information pulled from the chosen nominatim db.
+where *input.json* must be an existing and valid .json file, and must have "lat" and "lon" fields.
+The optional -f specifies the style of the output json file (see below for an example). If omitted, the input file style will be preserved.
+An *output.json* file will be created with the street information pulled from the chosen nominatim db.
 
 ### Input Sample
 
-Either:
+Either array-style:
 
 ```
 [
@@ -38,7 +40,7 @@ Either:
 ]
 ```
 
-or:
+or object-style:
 
 ```
 {
