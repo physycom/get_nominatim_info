@@ -28,9 +28,9 @@ int main(int narg, char** argv) {
   std::cout << "Usage: " << argv[0] << " -i [input.json] -o [output.json]" << std::endl;
   std::cout << "\t- [input.json] UNIBO style GPS .json file to parse" << std::endl;
   std::cout << "\t- [output.json] improved .json with geolocalization data" << std::endl;
-
-  // Parsing command line
-  std::string input_name, output_name;
+  
+   // Parsing command line
+  std::string input_name, output_name, outjson_type{};
   if (narg > 2){ /* Parse arguments, if there are arguments supplied */
     for (int i = 1; i < narg; i++){
       if ((argv[i][0] == '-') || (argv[i][0] == '/')){       // switches or options...
@@ -40,6 +40,9 @@ int main(int narg, char** argv) {
           break;
         case 'o':
           output_name = argv[++i];
+          break;
+        case 'f':
+          outjson_type = argv[++i];
           break;
         default:    // no match...
           std::cout << "Flag \"" << argv[i] << "\" not recognized. Quitting..." << std::endl;
@@ -68,8 +71,28 @@ int main(int narg, char** argv) {
 
   // Parsing of input.json and building of output.json
   jsoncons::json gps_records = jsoncons::json::parse_file(input_name);
-  jsoncons::json outjson(jsoncons::json::an_array);
 
+
+  jsoncons::json outjson;
+
+
+  //decide output type
+  bool outtype_array = false;
+
+  if(outjson_type == "a") //array
+  outjson = jsoncons::json(jsoncons::json::an_array), outtype_array = true;
+
+  else if(outjson_type == "o") {} //object
+
+  else if(outjson_type == "") {
+    if (gps_records.type() == 2) outjson = jsoncons::json(jsoncons::json::an_array), outtype_array = true;
+    //else if (gps_records.type() == 1) {}
+  }
+  
+  else {
+    std::cout << "Output type not recognized. Quitting..." << std::endl;
+    exit(4);
+  }
 
   if (gps_records.type() == 2) //array type
     for (size_t i = 0; i < gps_records.size(); ++i) {
@@ -90,7 +113,11 @@ int main(int narg, char** argv) {
         jsoncons::json ijson(gps_records[i]);
         ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
 
-        outjson.add(ijson);
+        if(outtype_array) outjson.add(ijson);
+        else {
+          std::ostringstream ostr; ostr << "gps_record_" << std::setfill('0') << std::setw(7) << i;
+          outjson[ostr.str()] = ijson;
+        }
       }
       catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
@@ -116,7 +143,11 @@ int main(int narg, char** argv) {
         jsoncons::json ijson(rec->value());
         ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
 
-        outjson.add(ijson);
+        if(outtype_array) outjson.add(ijson);
+        else {
+          outjson[rec->name()] = ijson;
+        }
+
       }
       catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
