@@ -19,7 +19,17 @@ along with json_to_html. If not, see <http://www.gnu.org/licenses/>.
 
 #include "jsoncons/json.hpp"
 
+#define MAJOR_VERSION           1
+#define MINOR_VERSION           0
+
 int main(int narg, char** argv) {
+// Usage
+  std::cout << "Get_Nominatim_Info - v" << MAJOR_VERSION << "." << MINOR_VERSION << std::endl;
+  std::cout << "Usage: " << argv[0] << " -i [input.json] -o [output.json]" << std::endl;
+  std::cout << "\t- [input.json] UNIBO style GPS .json file to parse" << std::endl;
+  std::cout << "\t- [output.json] improved .json with geolocalization data" << std::endl;
+
+// Parsing command line
   std::string input_name, output_name;
   if (narg > 2){ /* Parse arguments, if there are arguments supplied */
     for (int i = 1; i < narg; i++){
@@ -44,7 +54,7 @@ int main(int narg, char** argv) {
   }
   else { std::cout << "No flags specified. Read usage and relaunch properly." << std::endl; exit(111); }
 		
-	
+// Safety checks for file manipulations	
 	if( input_name.size() > 5 ){
     if( input_name.substr(input_name.size()-5,5)!=".json" ){
       std::cout << input_name << " is not a valid .json file. Quitting..." << std::endl;
@@ -56,10 +66,9 @@ int main(int narg, char** argv) {
     exit(22);
   }
 
+// Parsing of input.json and building of output.json
 	jsoncons::json gps_records = jsoncons::json::parse_file(input_name);
-
 	jsoncons::json outjson(jsoncons::json::an_array);
-
 	for (size_t i = 0; i < gps_records.size(); ++i) {
 		try {			
 			std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
