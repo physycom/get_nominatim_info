@@ -77,16 +77,11 @@ int main(int narg, char** argv) {
 
 
 	//decide output type
-	bool outjson_is_array = false;
-
 	if(outjson_type == "a") //array
-		outjson = jsoncons::json(jsoncons::json::an_array), outjson_is_array = true;
-
+		outjson = jsoncons::json(jsoncons::json::an_array);
 	else if(outjson_type == "o") {} //object
-
-	else if(outjson_type == "") {
-		if(gps_records.type() == 2) outjson = jsoncons::json(jsoncons::json::an_array), outjson_is_array = true;
-		//else if (gps_records.type() == 1) {}
+	else if(outjson_type == "") { //omitted
+		if(gps_records.type() == 2) outjson = jsoncons::json(jsoncons::json::an_array);
 	}
 
 	else {
@@ -113,7 +108,7 @@ int main(int narg, char** argv) {
 				jsoncons::json ijson(gps_records[i]);
 				ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
 
-				if(outjson_is_array) outjson.add(ijson);
+				if(outjson.is_array()) outjson.add(ijson);
 				else {
 					std::ostringstream ostr; ostr << "gps_record_" << std::setfill('0') << std::setw(7) << i;
 					outjson[ostr.str()] = ijson;
@@ -142,7 +137,7 @@ int main(int narg, char** argv) {
 				jsoncons::json ijson(rec->value());
 				ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
 
-				if(outjson_is_array) outjson.add(ijson);
+				if(outjson.is_array()) outjson.add(ijson);
 				else {
 					outjson[rec->name()] = ijson;
 				}
