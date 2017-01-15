@@ -78,10 +78,10 @@ int main(int narg, char** argv) {
 
 	//decide output type
 	if(outjson_type == "a") //array
-		outjson = jsoncons::json(jsoncons::json::an_array);
+		outjson = jsoncons::json::array();
 	else if(outjson_type == "o") {} //object
 	else if(outjson_type == "") { //omitted
-		if(gps_records.type() == 2) outjson = jsoncons::json(jsoncons::json::an_array);
+		if(gps_records.is_array()) outjson = jsoncons::json::array();
 	}
 
 	else {
@@ -89,7 +89,7 @@ int main(int narg, char** argv) {
 		exit(4);
 	}
 
-	if(gps_records.type() == 2) //array type
+	if(gps_records.is_array())
 		for(size_t i = 0; i < gps_records.size(); ++i) {
 			try {
 				std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
@@ -118,7 +118,7 @@ int main(int narg, char** argv) {
 			}
 		}
 
-	else if(gps_records.type() == 1) //object type
+	else if(gps_records.is_object()) //object type
 		for(auto rec = gps_records.begin_members(); rec != gps_records.end_members(); ++rec) {
 			try {
 				std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
@@ -160,3 +160,4 @@ int main(int narg, char** argv) {
 
 	return 0;
 }
+
