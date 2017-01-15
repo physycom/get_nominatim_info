@@ -1,3 +1,6 @@
+[![Build Status Master](https://travis-ci.org/physycom/get_nominatim_info.png?branch=master)](https://travis-ci.org/physycom/get_nominatim_info "master")
+
+
 ### Installation
 **Make** and a **C++11** compatible compiler are required. Also **wget** must be a recognized system command (if you're on Windows, try http://www.gnu.org/software/wget/).
 
