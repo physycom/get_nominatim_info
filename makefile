@@ -6,3 +6,8 @@ all: dirtree
 dirtree:
 	@mkdir -p bin
 
+clean:
+	rm -f bin/$(EXE)
+
+cleanall:
+	rm -rf bin obj
