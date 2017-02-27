@@ -31,10 +31,11 @@ Contains [jsoncons](https://github.com/danielaparker/jsoncons) as a git submodul
 
 ### Usage
 ```
-get_nominatim_info.exe -i input.json -o output.json -f [output style, 'a' (no quotes) for array or 'o' for object]
+get_nominatim_info.exe -i input.json -o output.json -f [output_style]
+[output_style]: use 'a' (no quotes) for array or 'o' for object
 ```
 where *input.json* must be an existing and valid .json file, and must have "lat" and "lon" fields.   
 The optional -f specifies the style of the output json file (see below for an example). If omitted, the input file style will be preserved.   
 An *output.json* file will be created with the street information pulled from the chosen nominatim db.   
-More details can be found in our technical description of the document formats (document still not published)
+More details about file formats is available [here](https://github.com/physycom/file_format_specifications/blob/master/formati_file.md).
 
