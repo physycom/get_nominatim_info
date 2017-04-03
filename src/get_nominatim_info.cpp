@@ -92,7 +92,7 @@ int main(int narg, char** argv) {
 	if(gps_records.is_array())
 		for(size_t i = 0; i < gps_records.size(); ++i) {
 			try {
-				std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
+				std::string url = R"("https://nominatim.openstreetmap.org/search.php?q=))"
 					+ gps_records[i]["lat"].as<std::string>()
 					+ "%2C+"
 					+ gps_records[i]["lon"].as<std::string>()
@@ -103,7 +103,7 @@ int main(int narg, char** argv) {
 
 				system(command.c_str());
 
-				jsoncons::json wget_out = jsoncons::json::parse_file("wget_out.json");
+				jsoncons::json wget_out = jsoncons::json::parse_file(outname);
 
 				jsoncons::json ijson(gps_records[i]);
 				ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
@@ -121,7 +121,7 @@ int main(int narg, char** argv) {
 	else if(gps_records.is_object()) //object type
 		for(auto rec = gps_records.begin_members(); rec != gps_records.end_members(); ++rec) {
 			try {
-				std::string url = R"("http://osmino.bo.infn.it/nominatim/search.php?q=)"
+				std::string url = R"("https://nominatim.openstreetmap.org/search.php?q=)"
 					+ rec->value()["lat"].as<std::string>()
 					+ "%2C+"
 					+ rec->value()["lon"].as<std::string>()
@@ -132,7 +132,7 @@ int main(int narg, char** argv) {
 
 				system(command.c_str());
 
-				jsoncons::json wget_out = jsoncons::json::parse_file("wget_out.json");
+				jsoncons::json wget_out = jsoncons::json::parse_file(outname);
 
 				jsoncons::json ijson(rec->value());
 				ijson["display_name"] = wget_out[0]["display_name"].as<std::string>();
