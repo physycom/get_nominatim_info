@@ -17,12 +17,38 @@ You should have received a copy of the GNU General Public License
 along with get_nominatim_info. If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 
-#include "jsoncons/json.hpp"
-
 #define MAJOR_VERSION           1
 #define MINOR_VERSION           0
 
-int main(int narg, char** argv) {
+#include "jsoncons/json.hpp"
+#include <cstdio>
+#include <string>
+#include <curl/curl.h>
+
+size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream){
+    size_t written = fwrite(ptr, size, nmemb, stream);
+    return written;
+}
+
+
+void get_json_file(std::string url_s, std::string file_s){
+    CURL *curl;
+    FILE *fp;
+    CURLcode res;
+    curl = curl_easy_init();
+    if (curl) {
+        fp = fopen(file_s.c_str(), "wb");
+        curl_easy_setopt(curl, CURLOPT_URL, url_s.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        res = curl_easy_perform(curl);
+        curl_easy_cleanup(curl);
+        fclose(fp);
+    }
+}
+
+
+int main(int narg, char** argv){
 	// Usage
 	std::cout << "Get_Nominatim_Info - v" << MAJOR_VERSION << "." << MINOR_VERSION << std::endl;
 	std::cout << "Usage: " << argv[0] << " -i [input.json] -o [output.json] -f [output format specifier]" << std::endl;
@@ -99,9 +125,8 @@ int main(int narg, char** argv) {
 					+ "&format=jsonv2\"";
 
 				std::string outname = "wget_out.json";
-				std::string command = "wget --output-document=" + outname + " " + url;
 
-				system(command.c_str());
+				get_json_file(url, outname);
 
 				jsoncons::json wget_out = jsoncons::json::parse_file(outname);
 
@@ -128,9 +153,8 @@ int main(int narg, char** argv) {
 					+ "&format=jsonv2\"";
 
 				std::string outname = "wget_out.json";
-				std::string command = "wget --output-document=" + outname + " " + url;
 
-				system(command.c_str());
+				get_json_file(url, outname);
 
 				jsoncons::json wget_out = jsoncons::json::parse_file(outname);
 

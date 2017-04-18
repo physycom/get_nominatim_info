@@ -195,16 +195,10 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 *.opendb
-*.txt
-*.json
 *.ipdb
 *.iobj
-*.exe
-*.png
-*.plt
 *.tlog
 *.db
 *.idb
 bin/
-obj/
 
