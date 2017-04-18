@@ -20,6 +20,7 @@ install:
   - cd vcpkg
   - powershell -exec bypass scripts\bootstrap.ps1
   - vcpkg integrate install
+  - vcpkg install curl
   - cd ..
   - cd C:\projects\get-nominatim-info
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
