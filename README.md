@@ -25,8 +25,11 @@ author: "Di Cristina, Fabbri, Guidetti, Sinigardi"
 This tool queries a nominatim database to add street information to a .json file containing latitude and longitude entries. 
 
 ### Installation
-`make` and a **C++11** compatible compiler are required. Also `wget` must be a recognized system command. Clone the repo and type ``make all`` in your favourite shell.   
-There's also a **VS2015** solution avalaible.   
+**CMake** and a **C++11** compatible compiler are required. To build the executable, clone the repo and then type  
+```
+mkdir build ; cd build ; cmake .. ; cmake --build . --target install
+```
+With CMake you can also deploy projects for the most common IDEs.  
 Contains [jsoncons](https://github.com/danielaparker/jsoncons) as a git submodule.
 
 ### Usage
